@@ -1,11 +1,71 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useCallback, useEffect } from "react";
+import PromptBar from "@/components/PromptBar";
+import OverviewSection from "@/components/OverviewSection";
+import DetailedSection from "@/components/DetailedSection";
+import ResilienceSection from "@/components/ResilienceSection";
+
+const TOTAL_SECTIONS = 3;
 
 const Index = () => {
+  const [current, setCurrent] = useState(0);
+
+  const goTo = useCallback((index: number) => {
+    if (index < 0 || index >= TOTAL_SECTIONS) return;
+    setCurrent(index);
+  }, []);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") goTo(current + 1);
+      if (e.key === "ArrowLeft") goTo(current - 1);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [current, goTo]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="h-screen w-screen overflow-hidden bg-background">
+      <PromptBar />
+
+      {/* Nav Dots */}
+      <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3">
+        {Array.from({ length: TOTAL_SECTIONS }).map((_, i) => (
+          <button
+            key={i}
+            onClick={() => goTo(i)}
+            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+              i === current ? "bg-primary scale-150" : "bg-muted"
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* Arrow Nav */}
+      {current > 0 && (
+        <button
+          onClick={() => goTo(current - 1)}
+          className="fixed left-5 top-1/2 -translate-y-1/2 z-50 text-5xl text-primary font-mono opacity-60 hover:opacity-100 hover:scale-110 transition-all"
+        >
+          ◂
+        </button>
+      )}
+      {current < TOTAL_SECTIONS - 1 && (
+        <button
+          onClick={() => goTo(current + 1)}
+          className="fixed right-14 top-1/2 -translate-y-1/2 z-50 text-5xl text-primary font-mono opacity-60 hover:opacity-100 hover:scale-110 transition-all"
+        >
+          ▸
+        </button>
+      )}
+
+      {/* Sections */}
+      <div
+        className="fixed inset-0 flex transition-transform duration-[900ms] ease-[cubic-bezier(0.77,0,0.175,1)]"
+        style={{ transform: `translateX(-${current * 100}vw)` }}
+      >
+        <OverviewSection />
+        <DetailedSection />
+        <ResilienceSection />
       </div>
     </div>
   );
