@@ -63,9 +63,9 @@ const Index = () => {
         className="fixed inset-0 flex transition-transform duration-[900ms] ease-[cubic-bezier(0.77,0,0.175,1)]"
         style={{ transform: `translateX(-${current * 100}vw)` }}
       >
-        <OverviewSection />
-        <DetailedSection />
-        <ResilienceSection />
+        <OverviewSection key={current === 0 ? "ov-active" : "ov-idle"} />
+        <DetailedSection key={current === 1 ? "dt-active" : "dt-idle"} />
+        <ResilienceSection key={current === 2 ? "rs-active" : "rs-idle"} />
       </div>
     </div>
   );
