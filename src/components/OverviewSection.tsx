@@ -39,13 +39,13 @@ const OverviewSection = () => {
       </motion.div>
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-4 gap-[2px] mb-8">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.3 }} className="grid grid-cols-4 gap-[2px] mb-8">
         {kpis.map((kpi, i) => (
           <motion.div
             key={kpi.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 * i }}
+            transition={{ duration: 0.5, delay: 0.3 + 0.1 * i }}
             className="bg-card border border-primary/[0.15] p-5 relative group overflow-hidden"
           >
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-primary scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500" />
@@ -58,12 +58,12 @@ const OverviewSection = () => {
             </div>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Lower Grid */}
       <div className="grid grid-cols-2 gap-5 flex-1">
         {/* Verdict */}
-        <div className="bg-card border border-primary/[0.15] p-6 flex flex-col gap-5">
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="bg-card border border-primary/[0.15] p-6 flex flex-col gap-5">
           <div>
             <div className="text-[9px] tracking-[0.25em] text-primary uppercase mb-4 pb-3 border-b border-primary/20">
               Analyst Verdict
@@ -82,10 +82,10 @@ const OverviewSection = () => {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Winners / Losers */}
-        <div className="flex flex-col gap-4">
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.8 }} className="flex flex-col gap-4">
           <div className="bg-card border border-primary/[0.15] p-6">
             <div className="text-[9px] tracking-[0.25em] text-positive/80 uppercase mb-4 pb-3 border-b border-primary/20">
               ↑ Who Benefits
@@ -112,7 +112,7 @@ const OverviewSection = () => {
               ))}
             </ul>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       <div className="absolute bottom-8 right-16 text-[120px] font-display font-bold text-primary/[0.06] leading-none pointer-events-none select-none">01</div>
