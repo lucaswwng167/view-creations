@@ -54,12 +54,21 @@ const chartStyle = {
 };
 
 const ChartPanel = ({ title, sub, children }: { title: string; sub: string; children: React.ReactNode }) => (
-  <div className="bg-card border border-primary/[0.15] p-5 flex flex-col">
+  <div className="bg-card border border-primary/[0.15] p-5 flex flex-col h-full">
     <div className="text-[9px] tracking-[0.2em] text-primary uppercase mb-1">{title}</div>
     <div className="text-[10px] text-muted mb-3.5">{sub}</div>
     <div className="flex-1 min-h-0">{children}</div>
   </div>
 );
+
+const chartVariants = {
+  hidden: { opacity: 0, y: 25 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, delay: 0.2 + 0.15 * i },
+  }),
+};
 
 const DetailedSection = () => {
   return (
@@ -75,59 +84,72 @@ const DetailedSection = () => {
       </motion.div>
 
       <div className="grid grid-cols-2 grid-rows-2 gap-4 flex-1">
-        <ChartPanel title="Spending Impact by Income Bracket" sub="% change in disposable income · annual">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={incomeData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
-              <XAxis dataKey="bracket" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
-              <Tooltip contentStyle={{ background: "#2c2018", border: "1px solid rgba(160,96,48,0.3)", color: "#ece8e0", fontFamily: "Courier Prime", fontSize: 11 }} />
-              <Bar dataKey="change" radius={[2, 2, 0, 0]}>
-                {incomeData.map((_, i) => <Cell key={i} fill={incomeColors[i]} />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartPanel>
+        {[
+          <ChartPanel key="income" title="Spending Impact by Income Bracket" sub="% change in disposable income · annual">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={incomeData}>
+                <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
+                <XAxis dataKey="bracket" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
+                <Tooltip contentStyle={{ background: "#2c2018", border: "1px solid rgba(160,96,48,0.3)", color: "#ece8e0", fontFamily: "Courier Prime", fontSize: 11 }} />
+                <Bar dataKey="change" radius={[2, 2, 0, 0]}>
+                  {incomeData.map((_, i) => <Cell key={i} fill={incomeColors[i]} />)}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartPanel>,
 
-        <ChartPanel title="Sector Price Pressure" sub="Projected price increase by category (%)">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={sectorData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} horizontal={false} />
-              <XAxis type="number" tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
-              <YAxis type="category" dataKey="sector" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} width={80} />
-              <Tooltip contentStyle={{ background: "#2c2018", border: "1px solid rgba(160,96,48,0.3)", color: "#ece8e0", fontFamily: "Courier Prime", fontSize: 11 }} />
-              <Bar dataKey="pressure" fill={`${chartStyle.accent}99`} barSize={14} radius={[0, 2, 2, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartPanel>
+          <ChartPanel key="sector" title="Sector Price Pressure" sub="Projected price increase by category (%)">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={sectorData} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} horizontal={false} />
+                <XAxis type="number" tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
+                <YAxis type="category" dataKey="sector" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} width={80} />
+                <Tooltip contentStyle={{ background: "#2c2018", border: "1px solid rgba(160,96,48,0.3)", color: "#ece8e0", fontFamily: "Courier Prime", fontSize: 11 }} />
+                <Bar dataKey="pressure" fill={`${chartStyle.accent}99`} barSize={14} radius={[0, 2, 2, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartPanel>,
 
-        <ChartPanel title="Spending Reallocation" sub="Shift in consumer basket · percentage points">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={basketData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
-              <XAxis dataKey="category" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: "#2c2018", border: "1px solid rgba(160,96,48,0.3)", color: "#ece8e0", fontFamily: "Courier Prime", fontSize: 11 }} />
-              <Bar dataKey="change" radius={[2, 2, 0, 0]}>
-                {basketData.map((d, i) => <Cell key={i} fill={d.change >= 0 ? "rgba(192,112,112,0.7)" : "rgba(122,184,138,0.7)"} />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartPanel>
+          <ChartPanel key="basket" title="Spending Reallocation" sub="Shift in consumer basket · percentage points">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={basketData}>
+                <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
+                <XAxis dataKey="category" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ background: "#2c2018", border: "1px solid rgba(160,96,48,0.3)", color: "#ece8e0", fontFamily: "Courier Prime", fontSize: 11 }} />
+                <Bar dataKey="change" radius={[2, 2, 0, 0]}>
+                  {basketData.map((d, i) => <Cell key={i} fill={d.change >= 0 ? "rgba(192,112,112,0.7)" : "rgba(122,184,138,0.7)"} />)}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartPanel>,
 
-        <ChartPanel title="Employment Trajectory" sub="Monthly job index · baseline = 100">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={employmentData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
-              <XAxis dataKey="month" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
-              <YAxis domain={[96, "auto"]} tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: "#2c2018", border: "1px solid rgba(160,96,48,0.3)", color: "#ece8e0", fontFamily: "Courier Prime", fontSize: 11 }} />
-              <Legend wrapperStyle={{ fontSize: 10, fontFamily: "Courier Prime" }} />
-              <Line type="monotone" dataKey="tariff" name="With Tariff" stroke={chartStyle.accent} strokeWidth={2} dot={{ r: 2, fill: chartStyle.accent }} fill={`${chartStyle.accent}18`} />
-              <Line type="monotone" dataKey="baseline" name="Baseline" stroke="rgba(112,104,94,0.5)" strokeWidth={1.5} strokeDasharray="4 4" dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartPanel>
+          <ChartPanel key="employment" title="Employment Trajectory" sub="Monthly job index · baseline = 100">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={employmentData}>
+                <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
+                <XAxis dataKey="month" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
+                <YAxis domain={[96, "auto"]} tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ background: "#2c2018", border: "1px solid rgba(160,96,48,0.3)", color: "#ece8e0", fontFamily: "Courier Prime", fontSize: 11 }} />
+                <Legend wrapperStyle={{ fontSize: 10, fontFamily: "Courier Prime" }} />
+                <Line type="monotone" dataKey="tariff" name="With Tariff" stroke={chartStyle.accent} strokeWidth={2} dot={{ r: 2, fill: chartStyle.accent }} fill={`${chartStyle.accent}18`} />
+                <Line type="monotone" dataKey="baseline" name="Baseline" stroke="rgba(112,104,94,0.5)" strokeWidth={1.5} strokeDasharray="4 4" dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartPanel>,
+        ].map((chart, i) => (
+          <motion.div
+            key={i}
+            custom={i}
+            variants={chartVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            {chart}
+          </motion.div>
+        ))}
       </div>
 
       <div className="absolute bottom-8 right-16 text-[120px] font-display font-bold text-primary/[0.06] leading-none pointer-events-none select-none">02</div>
