@@ -8,7 +8,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 
-type AgentId = "all" | `agent-${number}`;
+type AgentId = `agent-${number}`;
 type StatKey = "hunger" | "housing" | "injury" | "education" | "savings" | "happiness";
 
 const statLabels: Record<StatKey, string> = {
@@ -18,12 +18,27 @@ const statLabels: Record<StatKey, string> = {
 
 const AGENT_COUNT = 20;
 
-const agentLabels: Record<AgentId, string> = {
-  all: "All Agents",
-  ...Object.fromEntries(
-    Array.from({ length: AGENT_COUNT }, (_, i) => [`agent-${i + 1}`, `Agent ${i + 1}`])
-  ),
-} as Record<AgentId, string>;
+const agentLabels: Record<AgentId, string> = Object.fromEntries(
+  Array.from({ length: AGENT_COUNT }, (_, i) => [`agent-${i + 1}`, `Agent ${i + 1}`])
+) as Record<AgentId, string>;
+
+// Generate initial trait scores for each agent (deterministic)
+const getAgentTraits = (agentIndex: number): Record<StatKey, number> => {
+  const traits: Partial<Record<StatKey, number>> = {};
+  const keys: StatKey[] = ["savings", "hunger", "injury", "housing", "happiness", "education"];
+  keys.forEach((key, i) => {
+    const seed = agentIndex * 13 + i * 7 + 3;
+    const val = 40 + Math.round(seededRandom(seed) * 55);
+    traits[key] = val;
+  });
+  return traits as Record<StatKey, number>;
+};
+
+const traitDescriptor = (val: number): string => {
+  if (val >= 80) return "High";
+  if (val >= 55) return "Moderate";
+  return "Low";
+};
 
 // Seed-based pseudo-random for deterministic agent data
 const seededRandom = (seed: number) => {
@@ -104,12 +119,12 @@ const agentColors = [
 ];
 
 const ResilienceSection = () => {
-  const [agent, setAgent] = useState<AgentId>("all");
+  const [agent, setAgent] = useState<AgentId>("agent-1");
   const [stat, setStat] = useState<StatKey>("savings");
 
   const animKey = `${agent}-${stat}`;
-
-  const isAll = agent === "all";
+  const agentIndex = parseInt(agent.split("-")[1]);
+  const traits = getAgentTraits(agentIndex);
 
   return (
     <div className="min-w-full h-full px-[60px] pt-[90px] pb-10 flex flex-col relative">
@@ -149,88 +164,48 @@ const ResilienceSection = () => {
         </div>
       </motion.div>
 
-      {isAll ? (
-        <div className="grid grid-cols-2 gap-4 flex-1">
-          {[
-            <ChartPanel key="overlay" title={`${statLabels[stat]} · All 20 Agents`} sub="Individual agent trajectories overlaid">
-              <ResponsiveContainer width="100%" height="100%" key={animKey + "-overlay"}>
-                <AreaChart data={generateAgentData(1, stat)}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
-                  <XAxis dataKey="month" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
-                  <YAxis domain={[93, "auto"]} tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  {Array.from({ length: AGENT_COUNT }, (_, i) => {
-                    const data = generateAgentData(i + 1, stat);
-                    return (
-                      <Line
-                        key={i}
-                        data={data}
-                        type="monotone"
-                        dataKey="value"
-                        name={`Agent ${i + 1}`}
-                        stroke={agentColors[i]}
-                        strokeWidth={1}
-                        strokeOpacity={0.5}
-                        dot={false}
-                        animationDuration={ANIM_DURATION}
-                        animationEasing={ANIM_EASING}
-                      />
-                    );
-                  })}
-                </AreaChart>
-              </ResponsiveContainer>
-            </ChartPanel>,
+      {/* Agent Traits Summary */}
+      <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.4, delay: 0.15 }} viewport={{ once: true }} className="mb-6">
+        <div className="bg-card border border-primary/[0.15] p-4 flex items-center gap-6">
+          <div className="text-[9px] tracking-[0.2em] text-primary uppercase whitespace-nowrap">Initial Profile</div>
+          <div className="flex gap-4 flex-wrap">
+            {(Object.keys(statLabels) as StatKey[]).map((key) => (
+              <div key={key} className="flex items-center gap-1.5">
+                <span className="text-[10px] text-muted font-mono">{statLabels[key]}:</span>
+                <span className="text-[10px] text-foreground font-mono font-bold">{traits[key]}</span>
+                <span className={`text-[9px] font-mono ${traits[key] >= 80 ? "text-green-600" : traits[key] >= 55 ? "text-yellow-600" : "text-red-500"}`}>
+                  ({traitDescriptor(traits[key])})
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
 
-            <ChartPanel key="average" title={`${statLabels[stat]} · Population Average`} sub="Mean across all 20 agents">
-              <ResponsiveContainer width="100%" height="100%" key={animKey + "-avg"}>
-                <AreaChart data={generateAllAgentsData(stat)}>
-                  <defs>
-                    <linearGradient id="agentGradAvg" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={chartStyle.accent} stopOpacity={0.3} />
-                      <stop offset="100%" stopColor={chartStyle.accent} stopOpacity={0.02} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
-                  <XAxis dataKey="month" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
-                  <YAxis domain={[94, "auto"]} tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Legend wrapperStyle={{ fontSize: 10, fontFamily: "Courier Prime" }} />
-                  <Area type="monotone" dataKey="value" name="Average" stroke={chartStyle.accent} strokeWidth={2} fill="url(#agentGradAvg)" dot={{ r: 2, fill: chartStyle.accent }} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING} />
-                  <Line type="monotone" dataKey="baseline" name="Baseline" stroke="rgba(112,104,94,0.5)" strokeWidth={1.5} strokeDasharray="4 4" dot={false} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </ChartPanel>,
-          ].map((chart, i) => (
-            <motion.div key={i} custom={i} variants={chartVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-              {chart}
-            </motion.div>
-          ))}
-        </div>
-      ) : (
-        <div className="flex-1">
-          <motion.div custom={0} variants={chartVariants} initial="hidden" whileInView="visible" viewport={{ once: true }} className="h-full">
-            <ChartPanel title={`${statLabels[stat]} Over Time · ${agentLabels[agent]}`} sub="Monthly index trajectory">
-              <ResponsiveContainer width="100%" height="100%" key={animKey + "-single"}>
-                <AreaChart data={generateAgentData(parseInt(agent.split("-")[1]), stat)}>
-                  <defs>
-                    <linearGradient id="agentGradSingle" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={chartStyle.accent} stopOpacity={0.3} />
-                      <stop offset="100%" stopColor={chartStyle.accent} stopOpacity={0.02} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
-                  <XAxis dataKey="month" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
-                  <YAxis domain={[93, "auto"]} tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Legend wrapperStyle={{ fontSize: 10, fontFamily: "Courier Prime" }} />
-                  <Area type="monotone" dataKey="value" name={agentLabels[agent]} stroke={chartStyle.accent} strokeWidth={2} fill="url(#agentGradSingle)" dot={{ r: 2, fill: chartStyle.accent }} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING} />
-                  <Line type="monotone" dataKey="baseline" name="Baseline" stroke="rgba(112,104,94,0.5)" strokeWidth={1.5} strokeDasharray="4 4" dot={false} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </ChartPanel>
-          </motion.div>
-        </div>
-      )}
+      {/* Single agent chart */}
+      <div className="flex-1">
+        <motion.div custom={0} variants={chartVariants} initial="hidden" whileInView="visible" viewport={{ once: true }} className="h-full">
+          <ChartPanel title={`${statLabels[stat]} Over Time · ${agentLabels[agent]}`} sub="Monthly index trajectory">
+            <ResponsiveContainer width="100%" height="100%" key={animKey + "-single"}>
+              <AreaChart data={generateAgentData(agentIndex, stat)}>
+                <defs>
+                  <linearGradient id="agentGradSingle" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={chartStyle.accent} stopOpacity={0.3} />
+                    <stop offset="100%" stopColor={chartStyle.accent} stopOpacity={0.02} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
+                <XAxis dataKey="month" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
+                <YAxis domain={[93, "auto"]} tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Legend wrapperStyle={{ fontSize: 10, fontFamily: "Courier Prime" }} />
+                <Area type="monotone" dataKey="value" name={agentLabels[agent]} stroke={chartStyle.accent} strokeWidth={2} fill="url(#agentGradSingle)" dot={{ r: 2, fill: chartStyle.accent }} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING} />
+                <Line type="monotone" dataKey="baseline" name="Baseline" stroke="rgba(112,104,94,0.5)" strokeWidth={1.5} strokeDasharray="4 4" dot={false} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartPanel>
+        </motion.div>
+      </div>
 
       <div className="absolute bottom-8 right-16 text-[120px] font-display font-bold text-primary/[0.06] leading-none pointer-events-none select-none">03</div>
     </div>
