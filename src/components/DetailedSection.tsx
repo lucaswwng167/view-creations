@@ -208,7 +208,7 @@ const DetailedSection = () => {
         <div className="flex items-end justify-between mb-10">
           <div>
             <h1 className="font-display italic text-[clamp(32px,4vw,52px)] font-normal leading-[1.1] mb-1.5 text-foreground">
-              Stratified Impact<br />by Segment
+              Stratified Impact by Segment
             </h1>
             <div className="text-[11px] tracking-[0.15em] text-muted uppercase">
               Income cohorts · Sector breakdown · Spending reallocation

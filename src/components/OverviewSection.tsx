@@ -31,10 +31,10 @@ const OverviewSection = () => {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
         <div className="text-[10px] tracking-[0.3em] text-primary uppercase mb-2">01 — Overview</div>
         <h1 className="font-display italic text-[clamp(32px,4vw,52px)] font-normal leading-[1.1] mb-1.5 text-foreground">
-          Policy Impact<br />at a Glance
+          Policy Impact at a Glance
         </h1>
         <div className="text-[11px] tracking-[0.15em] text-muted uppercase mb-10">
-          Aggregate effects across Chicago metropolitan area · 12-month projection
+          Aggregate effects across metropolitan area · 12-month projection
         </div>
       </motion.div>
 
