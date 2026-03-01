@@ -6,47 +6,47 @@
 
 @layer base {
   :root {
-    --background: 20 30% 6%;
-    --foreground: 30 20% 90%;
+    --background: 215 80% 14%;
+    --foreground: 210 40% 92%;
 
-    --card: 20 20% 13%;
-    --card-foreground: 30 20% 90%;
+    --card: 215 70% 18%;
+    --card-foreground: 210 40% 92%;
 
-    --popover: 20 20% 13%;
-    --popover-foreground: 30 20% 90%;
+    --popover: 215 70% 18%;
+    --popover-foreground: 210 40% 92%;
 
-    --primary: 24 54% 41%;
-    --primary-foreground: 30 20% 90%;
+    --primary: 210 60% 70%;
+    --primary-foreground: 215 80% 14%;
 
-    --secondary: 20 15% 22%;
-    --secondary-foreground: 30 20% 90%;
+    --secondary: 215 50% 24%;
+    --secondary-foreground: 210 40% 92%;
 
-    --muted: 30 8% 40%;
-    --muted-foreground: 30 12% 64%;
+    --muted: 215 30% 35%;
+    --muted-foreground: 210 25% 65%;
 
-    --accent: 24 54% 41%;
-    --accent-foreground: 30 20% 90%;
+    --accent: 210 60% 70%;
+    --accent-foreground: 215 80% 14%;
 
     --destructive: 0 45% 50%;
-    --destructive-foreground: 30 20% 90%;
+    --destructive-foreground: 210 40% 92%;
 
-    --positive: 140 25% 50%;
-    --negative: 0 35% 55%;
+    --positive: 160 40% 55%;
+    --negative: 0 50% 60%;
 
-    --border: 24 54% 41% / 0.15;
-    --input: 24 54% 41% / 0.15;
-    --ring: 24 54% 41%;
+    --border: 210 60% 70% / 0.2;
+    --input: 210 60% 70% / 0.2;
+    --ring: 210 60% 70%;
 
     --radius: 0rem;
 
-    --sidebar-background: 20 30% 6%;
-    --sidebar-foreground: 30 20% 90%;
-    --sidebar-primary: 24 54% 41%;
-    --sidebar-primary-foreground: 30 20% 90%;
-    --sidebar-accent: 20 15% 22%;
-    --sidebar-accent-foreground: 30 20% 90%;
-    --sidebar-border: 24 54% 41% / 0.15;
-    --sidebar-ring: 24 54% 41%;
+    --sidebar-background: 215 80% 14%;
+    --sidebar-foreground: 210 40% 92%;
+    --sidebar-primary: 210 60% 70%;
+    --sidebar-primary-foreground: 215 80% 14%;
+    --sidebar-accent: 215 50% 24%;
+    --sidebar-accent-foreground: 210 40% 92%;
+    --sidebar-border: 210 60% 70% / 0.2;
+    --sidebar-ring: 210 60% 70%;
 
     --font-display: 'Playfair Display', serif;
     --font-mono: 'Courier Prime', monospace;
