@@ -239,73 +239,79 @@ const DetailedSection = () => {
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-2 grid-rows-2 gap-4 flex-1">
-        {[
-          <ChartPanel key="income" title={`${statLabels[stat]} Impact by Income Bracket`} sub={`% change · ${popLabels[popGroup]}`}>
-            <ResponsiveContainer width="100%" height="100%" key={animKey + "-income"}>
-              <BarChart data={incomeData}>
-                <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
-                <XAxis dataKey="bracket" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
-                <Tooltip contentStyle={tooltipStyle} />
-                <Bar dataKey="change" radius={[2, 2, 0, 0]} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING}>
-                  {incomeData.map((_, i) => <Cell key={i} fill={incomeColors[i]} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartPanel>,
+      {popGroup === "all" ? (
+        <div className="grid grid-cols-2 gap-4 flex-1">
+          {[
+            <ChartPanel key="compare" title={`${statLabels[stat]} Impact by Income Group`} sub="% change · Low / Middle / High">
+              <ResponsiveContainer width="100%" height="100%" key={animKey + "-compare"}>
+                <BarChart data={[
+                  { group: "Low Income", change: incomeDataSets[stat].low[0] },
+                  { group: "Middle Income", change: incomeDataSets[stat].middle[2] },
+                  { group: "High Income", change: incomeDataSets[stat].high[4] },
+                ]}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
+                  <XAxis dataKey="group" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Bar dataKey="change" radius={[2, 2, 0, 0]} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING}>
+                    <Cell fill="#c05050" />
+                    <Cell fill="#a06030" />
+                    <Cell fill="#64a050" />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartPanel>,
 
-          <ChartPanel key="sector" title={`Sector Price Pressure · ${statLabels[stat]}`} sub="Projected increase by category (%)">
-            <ResponsiveContainer width="100%" height="100%" key={animKey + "-sector"}>
-              <BarChart data={sectorData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} horizontal={false} />
-                <XAxis type="number" tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
-                <YAxis type="category" dataKey="sector" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} width={80} />
-                <Tooltip contentStyle={tooltipStyle} />
-                <Bar dataKey="pressure" fill={`${chartStyle.accent}99`} barSize={14} radius={[0, 2, 2, 0]} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING} />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartPanel>,
-
-          <ChartPanel key="basket" title={`Spending Reallocation · ${statLabels[stat]}`} sub={`Shift in consumer basket · ${popLabels[popGroup]}`}>
-            <ResponsiveContainer width="100%" height="100%" key={animKey + "-basket"}>
-              <BarChart data={basketData}>
-                <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
-                <XAxis dataKey="category" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={tooltipStyle} />
-                <Bar dataKey="change" radius={[2, 2, 0, 0]} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING}>
-                  {basketData.map((d, i) => <Cell key={i} fill={d.change >= 0 ? "rgba(192,112,112,0.7)" : "rgba(122,184,138,0.7)"} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartPanel>,
-
-          <ChartPanel key="employment" title={`Employment Trajectory · ${statLabels[stat]}`} sub={`Monthly job index · ${popLabels[popGroup]}`}>
-            <ResponsiveContainer width="100%" height="100%" key={animKey + "-employment"}>
-              <AreaChart data={employmentData}>
-                <defs>
-                  <linearGradient id="tariffGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={chartStyle.accent} stopOpacity={0.3} />
-                    <stop offset="100%" stopColor={chartStyle.accent} stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
-                <XAxis dataKey="month" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
-                <YAxis domain={[94, "auto"]} tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={tooltipStyle} />
-                <Legend wrapperStyle={{ fontSize: 10, fontFamily: "Courier Prime" }} />
-                <Area type="monotone" dataKey="tariff" name="With Tariff" stroke={chartStyle.accent} strokeWidth={2} fill="url(#tariffGrad)" dot={{ r: 2, fill: chartStyle.accent }} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING} />
-                <Line type="monotone" dataKey="baseline" name="Baseline" stroke="rgba(112,104,94,0.5)" strokeWidth={1.5} strokeDasharray="4 4" dot={false} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </ChartPanel>,
-        ].map((chart, i) => (
-          <motion.div key={i} custom={i} variants={chartVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            {chart}
+            <ChartPanel key="timeline-all" title={`${statLabels[stat]} Over Time · All Population`} sub="Monthly index trajectory">
+              <ResponsiveContainer width="100%" height="100%" key={animKey + "-timeline"}>
+                <AreaChart data={generateEmploymentData("all", stat)}>
+                  <defs>
+                    <linearGradient id="tariffGradAll" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={chartStyle.accent} stopOpacity={0.3} />
+                      <stop offset="100%" stopColor={chartStyle.accent} stopOpacity={0.02} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
+                  <XAxis dataKey="month" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
+                  <YAxis domain={[94, "auto"]} tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Legend wrapperStyle={{ fontSize: 10, fontFamily: "Courier Prime" }} />
+                  <Area type="monotone" dataKey="tariff" name="With Tariff" stroke={chartStyle.accent} strokeWidth={2} fill="url(#tariffGradAll)" dot={{ r: 2, fill: chartStyle.accent }} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING} />
+                  <Line type="monotone" dataKey="baseline" name="Baseline" stroke="rgba(112,104,94,0.5)" strokeWidth={1.5} strokeDasharray="4 4" dot={false} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </ChartPanel>,
+          ].map((chart, i) => (
+            <motion.div key={i} custom={i} variants={chartVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+              {chart}
+            </motion.div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex-1">
+          <motion.div custom={0} variants={chartVariants} initial="hidden" whileInView="visible" viewport={{ once: true }} className="h-full">
+            <ChartPanel title={`${statLabels[stat]} Over Time · ${popLabels[popGroup]}`} sub="Monthly index trajectory">
+              <ResponsiveContainer width="100%" height="100%" key={animKey + "-single"}>
+                <AreaChart data={generateEmploymentData(popGroup, stat)}>
+                  <defs>
+                    <linearGradient id="tariffGradSingle" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={chartStyle.accent} stopOpacity={0.3} />
+                      <stop offset="100%" stopColor={chartStyle.accent} stopOpacity={0.02} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.gridColor} vertical={false} />
+                  <XAxis dataKey="month" tick={{ fill: chartStyle.muted, fontSize: 10, fontFamily: "Courier Prime" }} axisLine={false} tickLine={false} />
+                  <YAxis domain={[94, "auto"]} tick={{ fill: chartStyle.muted, fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Legend wrapperStyle={{ fontSize: 10, fontFamily: "Courier Prime" }} />
+                  <Area type="monotone" dataKey="tariff" name="With Tariff" stroke={chartStyle.accent} strokeWidth={2} fill="url(#tariffGradSingle)" dot={{ r: 2, fill: chartStyle.accent }} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING} />
+                  <Line type="monotone" dataKey="baseline" name="Baseline" stroke="rgba(112,104,94,0.5)" strokeWidth={1.5} strokeDasharray="4 4" dot={false} animationDuration={ANIM_DURATION} animationEasing={ANIM_EASING} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </ChartPanel>
           </motion.div>
-        ))}
-      </div>
+        </div>
+      )}
 
       <div className="absolute bottom-8 right-16 text-[120px] font-display font-bold text-primary/[0.06] leading-none pointer-events-none select-none">02</div>
     </div>
