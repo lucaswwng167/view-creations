@@ -133,7 +133,7 @@ const ResilienceSection = () => {
         <div className="flex items-end justify-between mb-10">
           <div>
             <h1 className="font-display italic text-[clamp(32px,4vw,52px)] font-normal leading-[1.1] mb-1.5 text-foreground">
-              Agent-Based<br />Behavior Analysis
+              Agent-Based Behavior Analysis
             </h1>
             <div className="text-[11px] tracking-[0.15em] text-muted uppercase">
               20 agents · Personality-driven responses · Temporal dynamics
